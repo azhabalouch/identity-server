@@ -21,13 +21,13 @@ INSTALLED_APPS = [
     "accounts", "personas", "clients", "consent", "idp", "gateway",
 ]
 MIDDLEWARE = [
-    # "gateway.middleware.MaxBodySizeMiddleware",      # SECTION 4
+    "gateway.middleware.MaxBodySizeMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "gateway.middleware.SecurityHeadersMiddleware",  # SECTION 4
-    # "gateway.middleware.AuditMiddleware",            # SECTION 4
+    "gateway.middleware.SecurityHeadersMiddleware",
+    "gateway.middleware.AuditMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
