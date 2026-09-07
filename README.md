@@ -73,3 +73,49 @@ python manage.py check
 ![Phase 2 Gateway Test Run Evidence](evidence/phase2-gateway.png)
 
 Pass: System check identified no issues . The behaviour tests for this phase (a gaming token receives 403 on a professional route) run in Section 6, once routes exist.
+
+## 5. Phase 2 – Resource routes
+
+At the end of this phase all API routes are live. The table lists them;
+
+| Method | Path | Required scope | Success | Main failure cases |
+| --- | --- | --- | --- | --- |
+| POST | `/api/v1/oauth/token` | Client id + secret | 200 | 400 malformed grant, 401 bad secret |
+| POST | `/api/v1/oauth/revoke` | Client id + secret | 200 | 401 unknown client |
+| GET | `/api/v1/.well-known/jwks.json` | None | 200 | — |
+| POST | `/api/v1/auth/login` | Email + password | 200 + cookie | 401, 403 foreign origin |
+| POST | `/api/v1/auth/refresh` | Refresh cookie | 200 + new cookie | 401 |
+| POST | `/api/v1/auth/logout` | Refresh cookie | 204 | — |
+| POST | `/api/v1/users` | None | 201 | 400 invalid payload, 409 email in use |
+| GET | `/api/v1/users/{id}/personas` | `read:profile:*` or owner session | 200 | 401 bad token, 403 no consent |
+| GET | `/api/v1/users/{id}/personas/{context}` | `read:profile:{context}` or owner | 200 | 401 bad token, 403 wrong scope |
+| PATCH | `/api/v1/users/{id}/personas/{context}` | `write:profile:{context}` or owner | 200 | 400 undefined key, 403 wrong scope |
+| GET | `/api/v1/users/{id}/names` | `read:profile:{context}`, `*` or owner | 200 | 403 |
+| POST | `/api/v1/users/{id}/names` | Owner session | 201 | 400, 403 |
+| DELETE | `/api/v1/users/{id}/names/{name_id}` | Owner session | 204 | 404 |
+| GET | `/api/v1/attribute-definitions` | None | 200 | — |
+| GET | `/api/v1/clients` | Corporate tier session | 200 | 400 unregistered domain |
+| POST | `/api/v1/clients` | Corporate tier session | 201 | 400 unregistered domain |
+| GET | `/api/v1/clients/{client_id}` | Corporate tier session | 200 | 404 |
+| GET | `/api/v1/consents` | Consumer tier session | 200 | 401 not signed in |
+| POST | `/api/v1/consents` | Consumer tier session | 201 | 400 unknown persona context |
+| DELETE | `/api/v1/consents/{id}` | Consumer tier session | 204 | 403 grant belongs to another user |
+| DELETE | `/api/v1/users/{id}` | Consumer tier session (account owner only) | 204 | 401 not signed in, 403 not the account owner |
+
+### How a third-party app gets consent
+
+![Phase 2 oauth persona consent sequence](evidence/oauth_persona_consent_sequence.png)
+
+Part A – Identity and account endpoints
+Part B – Persona, names, client and consent routes
+
+### Exit test – routes compile
+
+```powershell
+python manage.py check
+python manage.py makemigrations --check --dry-run
+```
+
+Pass: no issues, and No changes detected . Behaviour is checked in next section
+
+![Phase 2 Route Test Run Evidence](evidence/phase2-resource-routes-1.png)
