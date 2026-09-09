@@ -98,7 +98,7 @@ class PersonaScopePermission(BasePermission):
         if client is None or request_origin(request) != client.registered_domain:
             deny(request, PermissionDenied, "origin not registered", **extra)
 
-        if not consent_active(claims["sub"], client.pk, record, claims["persona"], claims["scope"]): # 4. consent
+        if not consent_active(claims["sub"], client.pk, claims["persona"], claims["scope"]): # 4. consent record
             deny(request, PermissionDenied, "no active consent", **extra)
 
         if view.required_scope(request) != claims["scope"]:   # 5. scope

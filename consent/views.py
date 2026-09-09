@@ -68,9 +68,7 @@ class ConsentListCreateView(APIView):
                 return bad_request("redirect_uri must be on the client's registered domain")
             
             redirect_to = _add_query(data["redirect_uri"], {"user_id": request.auth["sub"], "persona": context})
-            grant = ConsentGrant.objects.filter(
-            user_id=request.auth["sub"], client=client, persona_context=context, revoked_at__isnull=True
-        ).first()
+        grant = ConsentGrant.objects.filter(user_id=request.auth["sub"], client=client, persona_context=context, revoked_at__isnull=True).first()
         created = grant is None
 
         if created:

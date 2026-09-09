@@ -63,8 +63,8 @@ STATIC_URL = "static/"
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
     "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser", "rest_framework.parsers.FormParser"],
-    # "DEFAULT_AUTHENTICATION_CLASSES": ["gateway.authentication.BearerTokenAuthentication"],
-    # "DEFAULT_PERMISSION_CLASSES": ["gateway.permissions.DenyByDefault"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["gateway.authentication.BearerTokenAuthentication"],
+    "DEFAULT_PERMISSION_CLASSES": ["gateway.permissions.DenyByDefault"],
     "DEFAULT_THROTTLE_RATES": {"token": "30/minute", "login": "10/minute"},
     "UNAUTHENTICATED_USER": None,
     "TEST_REQUEST_DEFAULT_FORMAT": "json",

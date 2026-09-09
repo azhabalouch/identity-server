@@ -119,3 +119,56 @@ python manage.py makemigrations --check --dry-run
 Pass: no issues, and No changes detected . Behaviour is checked in next section
 
 ![Phase 2 Route Test Run Evidence](evidence/phase2-resource-routes-1.png)
+
+## Phase 2 – Demo data and manual API check (exit test for Phase 2)
+
+The results shown are the real responses
+
+Start the server and load the demo
+
+Terminal 1:
+
+```powershell
+python manage.py runserver 8000
+
+```
+
+Terminal 2:
+
+Runs the script and compare the result
+
+```powershell
+.\test-powershell\test-phase2.ps1
+
+```
+
+| # | What you test | Command | Expected result |
+| --- | --- | --- | --- |
+| 1 | Get a gaming token | see block A | JSON with `access_token` |
+| 2 | Read own persona | block B | 200 and three gaming attributes |
+| 3 | Read another persona | block C | 403 `{"detail":"scope mismatch"}` |
+| 4 | Wrong scope format | block D | 400 `invalid_scope` with the format hint |
+| 5 | User revokes consent | block E | 204 |
+| 6 | Same token again | block B | 403 `{"detail":"no active consent"}` |
+| 7 | User grants again | block F | 201 |
+| 8 | Same token again | block B | 200 |
+| 9 | Duplicate email | block G | 409 `{"detail":"email already in use"}` |
+| 10 | Professional key into gaming | block H | 400 undefined attribute key for the gaming context |
+| 11 | Client revokes its token | block I, then B | 200, then 401 `{"detail":"token revoked"}` |
+
+Pass: allowed and denied requests both appear, with reasons such as scope mismatch ,no active consent and token revoked. 
+
+![Phase 2 Demo data and manual API check Image 1](evidence/Phase2-demo-data-and-manual-API-check.png)
+
+![Phase 2 Demo data and manual API check Image 2](evidence/Phase2-demo-data-and-manual-API-check-2.png)
+
+### Check the audit trail
+
+```powershell
+psql -U identity -h 127.0.0.1 identity -c "SELECT client_id, persona_context, 
+endpoint, decision, reason, status_code FROM access_log ORDER BY id DESC 
+LIMIT 12;"
+
+```
+
+![Phase 2 audit trail](evidence/audit-trail.png)
