@@ -172,3 +172,55 @@ LIMIT 12;"
 ```
 
 ![Phase 2 audit trail](evidence/audit-trail.png)
+
+## Phase 3 – React front end
+
+At the end of this phase a user can sign in, switch between the three personas, edit
+attributes and names, approve a client on the authorisation screen, and withdraw a grant
+in one click.
+
+| Decision | Choice | Reason |
+| --- | --- | --- |
+| Where the access token lives | JavaScript memory only | A cross-site scripting fault cannot read it from storage |
+| Where the refresh token lives | `HttpOnly`, `Secure`, `SameSite=Strict` cookie | Scripts cannot read it at all |
+| How the browser reaches the API | Same origin, through a proxy (`/api/...`) | A `SameSite=Strict` cookie is not sent on cross-site requests, so `*.pages.dev` calling `*.vercel.app` directly would break refresh |
+| Proxy in development | Vite dev server proxy | No CORS needed locally |
+| Proxy in production | Cloudflare Pages Function | Same reason, in production |
+
+### Test Details: Exit test – Phase 3
+
+https://github.com/azhabalouch/identity-client
+
+1. Terminal 1: python manage.py runserver 8000 in `server`. Terminal 2: npm run dev in `client`.
+
+![Phase 3 server running](evidence/phase3-test-1.png)
+
+![Phase 3 client running](evidence/phase3-test-2.png)
+
+2. Open http://localhost:5173 and sign in as demo@example.com / demo-password-123 
+
+![Phase 3 client signing in](evidence/phase3-test-3.png)
+
+3. Switch Gaming ↔ Professional. The legal name appears only under Professional.
+
+![Phase 3 client switching persona from professional](evidence/phase3-test-4.png)
+
+![Phase 3 client switched persona to gaming](evidence/phase3-test-5.png)
+
+4. In a third terminal, get a gaming token and read the gaming persona using previous test-phase2.ps1 script
+
+![Phase 3 client testing block a and b](evidence/phase3-test-6.png)
+
+5. On Active grants, click Revoke for Arcade Hub. Repeat block B: 403 no active consent. Use script test-phase3-blockb.ps1
+
+![Phase 3 revoking access from grant](evidence/phase3-test-8.png)
+
+![Phase 3 revoking access from grant](evidence/phase3-test-9.png)
+
+![Phase 3 testing no consent 403](evidence/phase3-test-10.png)
+
+6. Reload the browser page. You stay signed in, which proves the refresh cookie works.
+
+![Phase 3 refreshing cookies](evidence/phase3-test-7.png)
+
+`Pass: step 5 returns 403. This is the Phase 3 exit test in my roadmap.`
