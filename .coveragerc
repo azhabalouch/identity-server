@@ -1,0 +1,7 @@
+[run]
+source = accounts, personas, clients, consent, idp, gateway
+omit = 
+    */migrations/*,
+    */apps.py,
+    */__init__.py,
+    */management/*

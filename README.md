@@ -224,3 +224,33 @@ https://github.com/azhabalouch/identity-client
 ![Phase 3 refreshing cookies](evidence/phase3-test-7.png)
 
 `Pass: step 5 returns 403. This is the Phase 3 exit test in my roadmap.`
+
+## Phase 4 – Deployment
+
+![Phase 4 Azure Portal](evidence/phase4-Azure.png)
+
+![Phase 4 Vercel Portal](evidence/phase4-vercel.png)
+
+![Phase 4 Cloudfare Dashboard](evidence/phase4-cloudfare.png)
+
+![Phase 4 Website](evidence/phase4-frontend.png)
+
+## Phase 5 - Unit Testing and Evaluation
+
+At the end of this phase the automated suite passes, the tests are shown to catch broken security rules. When I ran this suite against the code, 148 tests passed with 97% line coverage (migrations and app configs excluded) Why the Final Score Is 97% Instead of 100% The remaining 30 missed statements belong to defensive fallback code and edge-case exceptions that were never triggered during the 148 test runs
+
+| Test File | Tests | Report Group (Chapter V B) |
+| :--- | :---: | :--- |
+| `test_contract.py` | 56 | Endpoint contract |
+| `test_isolation.py` | 31 | Cross-persona isolation |
+| `test_authentication.py` | 16 | Authentication failures (401) |
+| `test_authorisation.py` | 14 | Authorisation failures (403) |
+| `test_constraints.py` | 12 | Database constraints |
+| `test_consent_lifecycle.py` | 8 | Consent lifecycle |
+| `test_audit.py` | 4 | Audit trail (new group) |
+| `test_boundaries.py` | 7 | Architecture rules (new group) |
+| **Total** | **148** | Each parametrised case counts as one test |
+
+![Phase 5 - Unit Testing Running](evidence/phase5-testing-and-evaluation.png)
+
+Pass: 148 passed 
