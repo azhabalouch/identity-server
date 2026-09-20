@@ -4,6 +4,8 @@ class StrictSerializer(serializers.Serializer):
     """Reject unexpected fields instead of ignoring them (mass assignment defence)."""
 
     def to_internal_value(self, data):
+        unknown = []
+
         if hasattr(data, "keys"):
             unknown = sorted(set(data.keys()) - set(self.fields))
             

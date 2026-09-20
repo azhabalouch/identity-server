@@ -1,11 +1,14 @@
 from django.db import IntegrityError, transaction
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from gateway.decisions import record
-from gateway.permissions import AllowPublic
+from gateway.decisions import deny, record
+from gateway.permissions import AllowPublic, SessionPermission
+
+from idp import verify
 
 from personas.constants import CONTEXTS
 from personas.models import Persona
@@ -39,3 +42,25 @@ class RegisterView(APIView):
             return Response({"detail": "email already in use"}, status=status.HTTP_409_CONFLICT)
         
         return Response({"id": str(user.id), "email": user.email}, status=status.HTTP_201_CREATED)
+
+class UserDetailView(APIView):
+    """DELETE /api/v1/users/{id} — the account owner erases the whole identity (GDPR Art. 17)."""
+
+    permission_classes = [SessionPermission]  # client tokens get 403 "session token required"
+
+    def delete(self, request, user_id):
+        claims = request.auth
+
+        if str(user_id) != claims["sub"]:
+            deny(request, PermissionDenied, "not the account owner")
+
+        # The foreign keys cascade: personas, persona attributes, contextual names,
+        # consent grants and the API clients this user registered are all removed.
+        User.objects.filter(id=user_id).delete()
+
+        # Revoke the token used for this request. Other session and refresh tokens
+        # fail the account check, and client tokens fail the consent check.
+        verify.revoke(claims)
+
+        record(request, "allow", "account deleted")
+        return Response(status=status.HTTP_204_NO_CONTENT)

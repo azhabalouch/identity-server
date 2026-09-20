@@ -1,6 +1,6 @@
 from django.urls import path
 
-from accounts.views import RegisterView
+from accounts.views import RegisterView, UserDetailView
 from clients.views import ClientListCreateView, ClientPublicView
 from consent.views import ConsentDetailView, ConsentListCreateView
 from idp.session_views import LoginView, LogoutView, RefreshView
@@ -24,6 +24,7 @@ urlpatterns = [
     
     # accounts and personas
     path("api/v1/users", RegisterView.as_view(), name="users"),
+    path("api/v1/users/<uuid:user_id>", UserDetailView.as_view(), name="user"),
     path("api/v1/users/<uuid:user_id>/personas", PersonaListView.as_view(), name="personas"),
     path("api/v1/users/<uuid:user_id>/personas/<str:context>", PersonaDetailView.as_view(), name="persona"),
     path("api/v1/users/<uuid:user_id>/names", NamesView.as_view(), name="names"),

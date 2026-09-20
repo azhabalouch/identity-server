@@ -237,7 +237,7 @@ https://github.com/azhabalouch/identity-client
 
 ## Phase 5 - Unit Testing and Evaluation
 
-At the end of this phase the automated suite passes, the tests are shown to catch broken security rules. When I ran this suite against the code, 148 tests passed with 97% line coverage (migrations and app configs excluded) Why the Final Score Is 97% Instead of 100% The remaining 30 missed statements belong to defensive fallback code and edge-case exceptions that were never triggered during the 148 test runs
+At the end of this phase the automated suite passes, the tests are shown to catch broken security rules. When I ran this suite against the code, 160 tests passed with 97% line coverage (migrations and app configs excluded) Why the Final Score Is 97% Instead of 100% The remaining 29 missed statements belong to defensive fallback code and edge-case exceptions that were never triggered during the 160 test runs
 
 | Test File | Tests | Report Group (Chapter V B) |
 | :--- | :---: | :--- |
@@ -249,8 +249,9 @@ At the end of this phase the automated suite passes, the tests are shown to catc
 | `test_consent_lifecycle.py` | 8 | Consent lifecycle |
 | `test_audit.py` | 4 | Audit trail (new group) |
 | `test_boundaries.py` | 7 | Architecture rules (new group) |
-| **Total** | **148** | Each parametrised case counts as one test |
+| `test_account_deletion.py` | 12 | Account deletion (new group) |
+| **Total** | **160** | Each parametrised case counts as one test |
 
 ![Phase 5 - Unit Testing Running](evidence/phase5-testing-and-evaluation.png)
 
-Pass: 148 passed 
+Pass: 160 passed 

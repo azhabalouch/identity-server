@@ -4,7 +4,7 @@ from personas.constants import CONTEXTS
 
 SCOPE_PATTERN = re.compile(r"^(read|write):profile:(professional|personal|gaming|\*)$")
 SCOPE_FORMAT_HINT = (
-    "Send one scope in the form read:profile:<context> or write:profile:<context>"
+    "Send one scope in the form read:profile:<context> or write:profile:<context>. "
     f"<context> must be one of {', '.join(CONTEXTS)}, in lower case. "
     "read:profile:* reads every persona the user has consented to."
 )

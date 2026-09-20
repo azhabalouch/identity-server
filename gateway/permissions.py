@@ -3,6 +3,7 @@ from django.conf import settings
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated, PermissionDenied
 from rest_framework.permissions import BasePermission
 
+from accounts.models import User
 from clients.models import ApiClient
 from consent.models import ConsentGrant
 from idp.verify import is_revoked
@@ -33,6 +34,11 @@ def consent_active(user_id, client_pk, persona, scope):
     
     grant = grants.filter(persona_context=persona).first()
     return grant is not None and scope in grant.scope.split()
+
+def account_active(user_id):
+    """A session token outlives a deleted account by up to 15 minutes. This check closes that gap."""
+
+    return User.objects.filter(id=user_id, is_active=True).exists()
 
 def first_party_origin_ok(request):
     origin = request_origin(request)
@@ -66,6 +72,9 @@ class SessionPermission(BasePermission):
         if claims["typ"] != "session":
             deny(request, PermissionDenied, "session token required")
 
+        if not account_active(claims["sub"]):
+            deny(request, AuthenticationFailed, "account deleted")
+
         if not first_party_origin_ok(request):
             deny(request, PermissionDenied, "origin not registered")
 
@@ -88,6 +97,8 @@ class PersonaScopePermission(BasePermission):
             deny(request, PermissionDenied, "subject mismatch")
 
         if claims["typ"] == "session":                         # owner managing own data
+            if not account_active(claims["sub"]):
+                deny(request, AuthenticationFailed, "account deleted")
             if not first_party_origin_ok(request):
                 deny(request, PermissionDenied, "origin not registered")
             record(request, "allow", "owner", persona=view.kwargs.get("context"))
