@@ -26,6 +26,15 @@ def test_raw_sql_bypass_also_fails(user):
             "INSERT INTO persona_attributes (persona_id, attribute_key, context, attribute_value, visibility_level)"
             " VALUES (%s, 'job_title', 'gaming', 'x', 'public')", [persona.id])
         
+def test_raw_sql_with_mismatched_context_column_fails(user):
+    """The row's context must match its persona (migration 0004)."""
+
+    persona = Persona.objects.get(user=user, context="gaming")
+    with pytest.raises(IntegrityError), transaction.atomic(), connection.cursor() as cursor:
+        cursor.execute(
+            "INSERT INTO persona_attributes (persona_id, attribute_key, context, attribute_value, visibility_level)"
+            " VALUES (%s, 'job_title', 'professional', 'x', 'public')", [persona.id])
+
 def test_context_column_is_copied_from_persona(user):
     persona = Persona.objects.get(user=user, context="gaming")
     row = PersonaAttribute(persona=persona, attribute_key_id="avatar_url", attribute_value="https://a.example/x.png")
